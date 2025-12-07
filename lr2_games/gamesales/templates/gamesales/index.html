@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>lr2_games — Объявления о продаже видеоигр</title>
+    <link rel="stylesheet" href="{% static 'gamesales/style.css' %}">
+</head>
+<body>
+    <h1>Объявления о продаже видеоигр</h1>
+    <p><a href="{% url 'add' %}">+ Добавить объявление</a></p>
+
+    <form method="get" style="margin-bottom: 20px;">
+        <div>
+            <input type="text" name="q" value="{{ query }}" placeholder="Поиск по названию или описанию" />
+            <button type="submit">Найти</button>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <strong>Платформы:</strong><br>
+            {% for value, label in platforms %}
+                <label style="margin-right: 15px; display: inline-block;">
+                    <input type="checkbox" name="platforms" value="{{ value }}"
+                        {% if value in selected_platforms %}checked{% endif %}>
+                    {{ label }}
+                </label>
+            {% endfor %}
+        </div>
+    </form>
+
+    {% if ads %}
+        {% for ad in ads %}
+            <div style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                {% if ad.image %}
+                    <img src="{{ ad.image.url }}" alt="{{ ad.title }}" width="120" style="margin-right: 15px;">
+                {% endif %}
+                <div>
+                    <h2>{{ ad.title }}</h2>
+                    <p><strong>Платформа:</strong> {{ ad.get_platform_display }}</p>
+                    <p><strong>Жанр:</strong> {{ ad.genre.name|default:"Не указан" }}</p>
+                    <p><strong>Состояние:</strong> {{ ad.get_condition_display }}</p>
+                    <p><strong>Цена:</strong> {{ ad.price }} ₽</p>
+                    <p>{{ ad.description|truncatewords:20 }}</p>
+                    <small>Опубликовано: {{ ad.published|date:"d.m.Y H:i" }}</small>
+                    {% if user.is_authenticated and ad.author == user %}
+                        <p>
+                            <a href="{% url 'edit' ad.pk %}">Редактировать</a> |
+                            <a href="{% url 'delete' ad.pk %}">Удалить</a>
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+
+        <!-- Пагинация (если используется ListView с paginate_by) -->
+        {% if is_paginated %}
+          <div style="margin-top: 20px; text-align: center;">
+            {% if page_obj.has_previous %}
+              <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% for plat in selected_platforms %}platforms={{ plat }}&{% endfor %}page=1">&laquo; Первая</a>
+              <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% for plat in selected_platforms %}platforms={{ plat }}&{% endfor %}page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+
+            Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+
+            {% if page_obj.has_next %}
+              <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% for plat in selected_platforms %}platforms={{ plat }}&{% endfor %}page={{ page_obj.next_page_number }}">Следующая</a>
+              <a href="?{% if query %}q={{ query|urlencode }}&{% endif %}{% for plat in selected_platforms %}platforms={{ plat }}&{% endfor %}page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+    {% else %}
+        <p>Объявлений не найдено.</p>
+    {% endif %}
+</body>
+</html>

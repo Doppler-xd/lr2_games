@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Добавить объявление — lr2_games</title>
+    <link rel="stylesheet" href="/static/gamesales/style.css">
+</head>
+<body>
+    <h1>Добавить игру на продажу</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Опубликовать</button>
+    </form>
+</body>
+</html>

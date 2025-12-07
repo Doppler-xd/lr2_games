@@ -1,0 +1,7 @@
+<h2>Удалить объявление?</h2>
+<p>Вы уверены, что хотите удалить «{{ object.title }}»?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Да, удалить</button>
+</form>
+<a href="{% url 'index' %}">Нет, отмена</a>

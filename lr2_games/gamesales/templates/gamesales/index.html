@@ -7,9 +7,25 @@
     <link rel="stylesheet" href="{% static 'gamesales/style.css' %}">
 </head>
 <body>
-    <h1>Объявления о продаже видеоигр</h1>
+    {% if current_genre %}
+        <h1>Игры в жанре «{{ current_genre.name }}»</h1>
+        <p><a href="{% url 'index' %}">← Все объявления</a></p>
+    {% else %}
+        <h1>Объявления о продаже видеоигр</h1>
+    {% endif %}
+
     <p><a href="{% url 'add' %}">+ Добавить объявление</a></p>
 
+    <!-- Панель жанров -->
+    <div style="margin-bottom: 20px;">
+        <strong>Жанры:</strong>
+        {% for genre in all_genres %}
+            <a href="{% url 'by_genre' genre.pk %}">{{ genre.name }}</a>
+            {% if not forloop.last %} | {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Форма поиска и фильтрации по платформам -->
     <form method="get" style="margin-bottom: 20px;">
         <div>
             <input type="text" name="q" value="{{ query }}" placeholder="Поиск по названию или описанию" />
@@ -52,7 +68,7 @@
             </div>
         {% endfor %}
 
-        <!-- Пагинация (если используется ListView с paginate_by) -->
+        <!-- Пагинация -->
         {% if is_paginated %}
           <div style="margin-top: 20px; text-align: center;">
             {% if page_obj.has_previous %}

@@ -37,7 +37,27 @@ class GameAdListView(ListView):
     template_name = 'gamesales/index.html'
     context_object_name = 'ads'
     paginate_by = 10  # пагинация
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_genre'] = Genre.objects.get(pk=self.kwargs['genre_id'])
+        context['platforms'] = GameAd.PLATFORM_CHOICES
+        context['all_genres'] = Genre.objects.all()
+        return context
+class GameAdByGenreView(ListView):
+    template_name = 'gamesales/index.html'
+    context_object_name = 'ads'
+    paginate_by = 10
 
+    def get_queryset(self):
+        genre_id = self.kwargs['genre_id']
+        return GameAd.objects.filter(genre_id=genre_id).order_by('-published')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['current_genre'] = Genre.objects.get(pk=self.kwargs['genre_id'])
+        context['platforms'] = GameAd.PLATFORM_CHOICES
+        context['all_genres'] = Genre.objects.all()
+        return context
 class GameAdCreateView(CreateView):
     model = GameAd
     form_class = GameAdForm
